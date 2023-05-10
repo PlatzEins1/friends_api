@@ -13,5 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Expose port 8000 for the Django app
 EXPOSE 8000
 
+# Run the command to start the Django tests
+CMD ["python", "manage.py", "test", "friendService"]
+
 # Run the command to start the Django app
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+

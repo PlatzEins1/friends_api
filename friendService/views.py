@@ -119,7 +119,7 @@ def create_friend_request(request):
 def friend_requests_list(request, user_id):
     # user_id = request.user.pk #while there is no auth system, we assume user_id as 1
 
-    query_set = FriendRequest.objects.filter(Q(to_user_id=user_id) | Q(from_user_id=user_id))
+    query_set = FriendRequest.objects.filter(Q(Q(to_user_id=user_id) | Q(from_user_id=user_id)) & Q(Q(accepted=False)&Q(discarded=False)))
     serializer = FriendRequestSerializer(query_set, many=True)
     return Response(serializer.data)
 
@@ -274,12 +274,13 @@ def delete_friend(request, user_1, user_2):
     # user_id = request.user.pk #while there is no auth system, we assume user_id as 1
 
     friend_request = FriendRequest.objects.filter(
-
+        Q(
         Q(
             Q(from_user_id=user_1) & Q(to_user_id=user_2) |
             Q(from_user_id=user_2) & Q(to_user_id=user_1))
-
-    )
+    ) & Q(
+        Q(accepted=True) & Q(discarded=False)
+    ))
     if friend_request:
         friend_request.delete()
         return Response({'success': 'friend deleted'}, status=status.HTTP_200_OK)
